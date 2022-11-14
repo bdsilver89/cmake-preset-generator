@@ -1,0 +1,203 @@
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CMakePreset {
+    version: u32,
+
+    #[serde(
+        rename(
+            serialize = "cmakeMinimumRequired",
+            deserialize = "cmakeMinimumRequired"
+        ),
+        skip_serializing_if = "Option::is_none"
+    )]
+    cmake_minimum_required: Option<CMakeMinimumRequired>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    include: Option<Vec<String>>,
+
+    vendor: Option<HashMap<String, String>>,
+
+    #[serde(
+        rename(serialize = "configurePresets", deserialize = "configurePresets"),
+        skip_serializing_if = "Option::is_none"
+    )]
+    configure_presets: Option<Vec<ConfigurePreset>>,
+
+    #[serde(
+        rename(serialize = "buildPresets", deserialize = "buildPresets"),
+        skip_serializing_if = "Option::is_none"
+    )]
+    build_presets: Option<Vec<BuildPreset>>,
+
+    #[serde(
+        rename(serialize = "testPresets", deserialize = "testPresets"),
+        skip_serializing_if = "Option::is_none"
+    )]
+    test_presets: Option<Vec<TestPreset>>,
+
+    #[serde(
+        rename(serialize = "packagePresets", deserialize = "packagePresets"),
+        skip_serializing_if = "Option::is_none"
+    )]
+    package_presets: Option<Vec<PackagePreset>>,
+
+    #[serde(
+        rename(serialize = "workflowPresets", deserialize = "workflowPresets"),
+        skip_serializing_if = "Option::is_none"
+    )]
+    workflow_presets: Option<Vec<WorkflowPreset>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CMakeMinimumRequired {
+    major: u32,
+    minor: u32,
+    patch: u32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ConfigurePreset {
+    name: String,
+    hidden: Option<bool>,
+    inherits: Option<Inherit>,
+    // conditon: Option<>,
+    // vendor: Option<>,
+    #[serde(rename(serialize = "displayName", deserialize = "displayName"))]
+    display_name: Option<String>,
+
+    description: Option<String>,
+    generator: Option<String>,
+
+    #[serde(rename(serialize = "toolchainFile", deserialize = "toolchainFile"))]
+    toolchain_file: Option<String>,
+
+    #[serde(rename(serialize = "binaryDir", deserialize = "binaryDir"))]
+    binary_dir: Option<String>,
+
+    #[serde(rename(serialize = "installDir", deserialize = "installDir"))]
+    install_dir: Option<String>,
+
+    // cmake_executable,
+    #[serde(rename(serialize = "cacheVariables", deserialize = "cacheVariables"))]
+    cache_variables: Option<HashMap<String, String>>,
+    // environment,
+    // warnings,
+    // errors,
+    // debug,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct BuildPreset {
+    name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TestPreset {
+    name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct InstallPreset {
+    name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PackagePreset {
+    name: String,
+    hidden: Option<bool>,
+    inherits: Option<Vec<String>>,
+    conditon: Option<Condition>,
+    vendor: Option<HashMap<String, String>>,
+
+    #[serde(rename(serialize = "displayName", deserialize = "displayName"))]
+    display_name: Option<String>,
+
+    description: Option<String>,
+    environment: Option<HashMap<String, String>>,
+
+    #[serde(rename(serialize = "configurePreset", deserialize = "configurePreset"))]
+    configure_preset: Option<String>,
+
+    #[serde(rename(
+        serialize = "inheritConfigureEnvironment",
+        deserialize = "inheritConfigureEnvironment"
+    ))]
+    inherit_configure_environment: Option<bool>,
+
+    generators: Option<Vec<String>>,
+
+    configurations: Option<Vec<String>>,
+
+    variables: Option<HashMap<String, String>>,
+
+    #[serde(rename(serialize = "configFile", deserialize = "configFile"))]
+    config_file: Option<String>,
+
+    output: Option<PackageOutput>,
+
+    #[serde(rename(serialize = "packageName", deserialize = "packageName"))]
+    package_name: Option<String>,
+
+    #[serde(rename(serialize = "packageVersion", deserialize = "packageVersion"))]
+    package_version: Option<String>,
+
+    #[serde(rename(serialize = "packageDirectory", deserialize = "packageDirectory"))]
+    package_directory: Option<String>,
+
+    #[serde(rename(serialize = "vendorName", deserialize = "vendorName"))]
+    vendor_name: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PackageOutput {
+    debug: Option<bool>,
+    verbose: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct WorkflowPreset {
+    name: String,
+
+    #[serde(rename(serialize = "displayName", deserialize = "displayName"))]
+    display_name: Option<String>,
+
+    description: Option<String>,
+
+    steps: Vec<WorkflowStep>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Condition {
+    #[serde(rename(serialize = "type", deserialize = "type"))]
+    condition_type: String,
+    value: Option<String>,
+    lhs: Option<String>,
+    rhs: Option<String>,
+    string: Option<String>,
+    list: Option<String>,
+    regex: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Inherit {
+    Single(String),
+    Multi(Vec<String>),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum ArchitectureToolset {
+    Simple(String),
+    Complex {
+        value: Option<String>,
+        strategy: Option<String>,
+    },
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct WorkflowStep {
+    #[serde(rename(serialize = "type", deserialize = "type"))]
+    type_name: String,
+    name: String,
+}
